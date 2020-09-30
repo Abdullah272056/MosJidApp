@@ -39,6 +39,15 @@ public class MainActivity extends AppCompatActivity {
     DataBaseHelper dataBaseHelper;
 
     CustomAdapter customAdapter;
+
+    int notificationId=0;
+    AlarmManager alarm;
+    PendingIntent alarmIntent;
+
+
+    long startTimeMiliSecond;
+
+    long endMilli;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,9 +112,31 @@ public class MainActivity extends AppCompatActivity {
                 endTime=minuteEditText.getText().toString();
                 int addMinute=Integer.parseInt(endTime);
                 endTimeMilliSecond=startTimeMilliSecond+(addMinute*60000);
+
                 int id=dataBaseHelper.insertData(new Notes(startTimeString,endTime,String.valueOf(startTimeMilliSecond),
                           String.valueOf(endTimeMilliSecond),"www",1));
                 if (id!=-1){
+
+                    Intent intent=new Intent(MainActivity.this, NotificationReceiver.class);
+                    intent.putExtra("notificationRequestCode",id);
+                    intent.putExtra("TargetTimeMilliSecond",startTimeMilliSecond);
+                    alarmIntent= PendingIntent.getBroadcast(MainActivity.this,
+                            (int) id,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+                    //get ALARM_SERVICE from SystemService
+                    alarm= (AlarmManager) getSystemService(ALARM_SERVICE);
+                    //alarm set
+                    alarm.set(AlarmManager.RTC_WAKEUP,startTimeMilliSecond,alarmIntent);
+
+                    alarmIntent= PendingIntent.getBroadcast(MainActivity.this,
+                            (int) id+100,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+                    //get ALARM_SERVICE from SystemService
+                    alarm= (AlarmManager) getSystemService(ALARM_SERVICE);
+                    int minuteInt =Integer.parseInt(minuteEditText.getText().toString());
+                    //alarm set
+                    alarm.set(AlarmManager.RTC_WAKEUP,(startTimeMilliSecond+(minuteInt*60000)),alarmIntent);
+
+
+
                     Toast.makeText(MainActivity.this, String.valueOf(id), Toast.LENGTH_SHORT).show();
                     loadData();
                     bottomSheetDialog.dismiss();

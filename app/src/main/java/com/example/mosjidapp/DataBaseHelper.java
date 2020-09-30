@@ -70,6 +70,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public int updateData(Notes notes){
+        SQLiteDatabase sqLiteDatabase=getWritableDatabase();
+        ContentValues contentValues=new ContentValues();
+        contentValues.put(Constant.COLUMN_START_TIME,notes.getStartTime());
+        contentValues.put(Constant.COLUMN_END_TIME,notes.getEntTime());
+        contentValues.put(Constant.COLUMN_START_TIME_MILLI,notes.getStartTimeMilli());
+        contentValues.put(Constant.COLUMN_END_TIME_MILLI,notes.getEndTimeMilli());
+        contentValues.put(Constant.COLUMN_SWITCH_STATUS,notes.getSwitchStatus());
+        contentValues.put(Constant.COLUMN_AUDIO_MODE,notes.getAudioMode());
+        int status = sqLiteDatabase.update(Constant.TABLE_NAME,contentValues," id=? ",new String[]{String.valueOf(notes.getId())});
+        return status;
+    }
+
 
 
 
